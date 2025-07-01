@@ -51,9 +51,6 @@ android {
 
 dependencies {
 
-    // KotlinML runtime dependency
-    implementation(project(":kotlinml-runtime"))
-
     // Standard Android dependencies
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -66,47 +63,23 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
-    // 🚀 UPDATED ML Kit Dependencies - Latest versions with 16 KB support
-    // Text Recognition - Updated version
-    implementation(libs.text.recognition)
+    // CameraX
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
 
-    // Language Identification - Updated version
-    implementation(libs.language.id)
+    // ML Kit
+    implementation("com.google.mlkit:text-recognition:16.0.0")
 
-    // Translation - Updated version
-    implementation(libs.translate)
-
-    // Camera Dependencies - Updated versions
-    implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.camera.camera2)
-    implementation(libs.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
 
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.6")
+    // Image loading
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
-    // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // JSON for saving data
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-
-    // Testing dependencies
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-
-    // Debug dependencies
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 }
