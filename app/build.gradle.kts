@@ -51,6 +51,9 @@ android {
 
 dependencies {
 
+    // KotlinML runtime dependency
+    implementation(project(":kotlinml-runtime"))
+
     // Standard Android dependencies
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -79,7 +82,12 @@ dependencies {
 
     // Image loading
     implementation("io.coil-kt:coil-compose:2.6.0")
+    androidTestImplementation(platform(libs.androidx.compose.bom.v20240600))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
 
 }
