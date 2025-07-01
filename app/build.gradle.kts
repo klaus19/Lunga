@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.buggy.lunga"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.buggy.lunga"
@@ -56,26 +56,26 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
-    // 🚀 ML Kit Dependencies - ADD THESE
-    // Text Recognition
-    implementation("com.google.mlkit:text-recognition:16.0.0")
+    // 🚀 UPDATED ML Kit Dependencies - Latest versions with 16 KB support
+    // Text Recognition - Updated version
+    implementation(libs.text.recognition)
 
-    // Language Identification
-    implementation("com.google.mlkit:language-id:17.0.4")
+    // Language Identification - Updated version
+    implementation(libs.language.id)
 
-    // Translation
-    implementation("com.google.mlkit:translate:17.0.1")
+    // Translation - Updated version
+    implementation(libs.translate)
 
-    // Camera Dependencies
-    implementation("androidx.camera:camera-core:1.3.1")
-    implementation("androidx.camera:camera-camera2:1.3.1")
-    implementation("androidx.camera:camera-lifecycle:1.3.1")
-    implementation("androidx.camera:camera-view:1.3.1")
+    // Camera Dependencies - Updated versions
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
 
-    // Navigation (for multiple screens)
+    // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
     // ViewModel

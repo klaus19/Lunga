@@ -84,7 +84,7 @@ fun TestKotlinMLScreen() {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         button(
-                            text = "➖",
+                            text = "-",
                             onClick = { counter-- }
                         )
 
@@ -94,7 +94,7 @@ fun TestKotlinMLScreen() {
                         )
 
                         button(
-                            text = "➕",
+                            text = "+",
                             onClick = { counter++ }
                         )
                     }
