@@ -2,6 +2,7 @@ package com.buggy.lunga.ui.components
 
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -9,27 +10,25 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 
-// ui/components/CameraPreview.kt
 @Composable
 fun CameraPreview(
     onImageCaptured: (ImageProxy) -> Unit,
-    onError: (Exception) -> Unit
+    onError: (Exception) -> Unit,  // Changed to generic Exception
+    shouldCapture: Boolean,
+    onCaptureComplete: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
 
-    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
+    var imageCapture: ImageCapture? = remember { null }
 
     AndroidView(
         factory = { ctx ->
@@ -57,7 +56,7 @@ fun CameraPreview(
                         imageCapture
                     )
                 } catch (exc: Exception) {
-                    onError(exc)
+                    onError(exc)  // Just pass the actual exception
                 }
             }, executor)
 
@@ -66,8 +65,25 @@ fun CameraPreview(
         modifier = Modifier.fillMaxSize()
     )
 
-    // Return imageCapture for external use
-    LaunchedEffect(imageCapture) {
-        // You can trigger capture from parent composable
+    // Handle capture trigger
+    LaunchedEffect(shouldCapture) {
+        if (shouldCapture) {
+            imageCapture?.let { capture ->
+                capture.takePicture(
+                    ContextCompat.getMainExecutor(context),
+                    object : ImageCapture.OnImageCapturedCallback() {
+                        override fun onCaptureSuccess(image: ImageProxy) {
+                            onImageCaptured(image)
+                            onCaptureComplete()
+                        }
+
+                        override fun onError(exception: ImageCaptureException) {
+                            onError(exception)  // ImageCaptureException is already an Exception
+                            onCaptureComplete()
+                        }
+                    }
+                )
+            }
+        }
     }
 }
