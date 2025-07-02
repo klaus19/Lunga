@@ -55,39 +55,38 @@ dependencies {
     implementation(project(":kotlinml-runtime"))
 
     // Standard Android dependencies
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
 
     // Compose BOM and dependencies
-    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
 
     // CameraX
-    implementation("androidx.camera:camera-camera2:1.3.4")
-    implementation("androidx.camera:camera-lifecycle:1.3.4")
-    implementation("androidx.camera:camera-view:1.3.4")
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     // ML Kit
-    implementation("com.google.mlkit:text-recognition:16.0.0")
+    implementation(libs.text.recognition)
 
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // Permissions
-    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+    implementation(libs.accompanist.permissions)
 
     // Image loading
-    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(libs.coil.compose)
     androidTestImplementation(platform(libs.androidx.compose.bom.v20240600))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation(libs.androidx.material.icons.extended)
 
 
 }

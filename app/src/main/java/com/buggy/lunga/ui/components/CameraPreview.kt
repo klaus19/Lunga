@@ -1,5 +1,6 @@
 package com.buggy.lunga.ui.components
 
+import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -8,46 +9,55 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @Composable
 fun CameraPreview(
     onImageCaptured: (ImageProxy) -> Unit,
-    onError: (Exception) -> Unit,  // Changed to generic Exception
+    onError: (Exception) -> Unit,
     shouldCapture: Boolean,
     onCaptureComplete: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
 
-    var imageCapture: ImageCapture? = remember { null }
+    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
+
+    // Create camera executor
+    val cameraExecutor: ExecutorService = remember { Executors.newSingleThreadExecutor() }
+
+    // Dispose executor when composable is disposed
+    DisposableEffect(Unit) {
+        onDispose {
+            cameraExecutor.shutdown()
+        }
+    }
 
     AndroidView(
         factory = { ctx ->
             val previewView = PreviewView(ctx)
-            val executor = ContextCompat.getMainExecutor(ctx)
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
 
             cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
-                val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
-
-                imageCapture = ImageCapture.Builder()
-                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                    .build()
-
-                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
                 try {
+                    val cameraProvider = cameraProviderFuture.get()
+
+                    val preview = Preview.Builder().build()
+                    preview.setSurfaceProvider(previewView.surfaceProvider)
+
+                    imageCapture = ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .build()
+
+                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
                         lifecycleOwner,
@@ -55,10 +65,14 @@ fun CameraPreview(
                         preview,
                         imageCapture
                     )
+
+                    Log.d("CameraPreview", "Camera bound successfully")
+
                 } catch (exc: Exception) {
-                    onError(exc)  // Just pass the actual exception
+                    Log.e("CameraPreview", "Camera binding failed", exc)
+                    onError(exc)
                 }
-            }, executor)
+            }, ContextCompat.getMainExecutor(ctx))
 
             previewView
         },
@@ -68,21 +82,32 @@ fun CameraPreview(
     // Handle capture trigger
     LaunchedEffect(shouldCapture) {
         if (shouldCapture) {
-            imageCapture?.let { capture ->
+            Log.d("CameraPreview", "Capture triggered")
+
+            val capture = imageCapture
+            if (capture != null) {
+                Log.d("CameraPreview", "Taking picture...")
+
                 capture.takePicture(
-                    ContextCompat.getMainExecutor(context),
+                    cameraExecutor,
                     object : ImageCapture.OnImageCapturedCallback() {
                         override fun onCaptureSuccess(image: ImageProxy) {
+                            Log.d("CameraPreview", "Image captured successfully")
                             onImageCaptured(image)
                             onCaptureComplete()
                         }
 
                         override fun onError(exception: ImageCaptureException) {
-                            onError(exception)  // ImageCaptureException is already an Exception
+                            Log.e("CameraPreview", "Image capture failed: ${exception.message}")
+                            onError(exception)
                             onCaptureComplete()
                         }
                     }
                 )
+            } else {
+                Log.e("CameraPreview", "ImageCapture is null!")
+                onError(Exception("Camera not ready"))
+                onCaptureComplete()
             }
         }
     }

@@ -1,55 +1,76 @@
 package com.buggy.lunga.ui.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.camera.core.ExperimentalGetImage
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGetImage::class)
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Top App Bar
-        TopAppBar(
-            title = { Text("Lunga") },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
-        )
-
-        // Tab Row
-        TabRow(selectedTabIndex = selectedTab) {
-            Tab(
-                selected = selectedTab == 0,
-                onClick = { selectedTab = 0 },
-                text = { Text("Camera") }
-            )
-            Tab(
-                selected = selectedTab == 1,
-                onClick = { selectedTab = 1 },
-                text = { Text("History") }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Language Assistant",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
         }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            // Tab Row
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ) {
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = { Text("Camera") },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = "Camera"
+                        )
+                    }
+                )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = { Text("History") },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.History,
+                            contentDescription = "History"
+                        )
+                    }
+                )
+            }
 
-        // Tab Content
-        when (selectedTab) {
-            0 -> CameraScreen()
-            1 -> HistoryScreen()
+            // Tab Content
+            when (selectedTab) {
+                0 -> CameraScreen()
+                1 -> HistoryScreen()
+            }
         }
     }
 }

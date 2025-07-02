@@ -1,6 +1,6 @@
 package com.buggy.lunga.ui.screens
 
-import androidx.camera.core.ExperimentalGetImage
+import android.util.Log
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,42 +10,50 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+class CameraViewModel : ViewModel() {
 
-class CameraViewModel(
-    private val textRecognitionRepository: TextRecognitionRepository = TextRecognitionRepository()
-) : ViewModel() {
+    private val textRecognitionRepository = TextRecognitionRepository()
 
-    private val _uiState = MutableStateFlow(CameraUiState())
-    val uiState: StateFlow<CameraUiState> = _uiState.asStateFlow()
+    private val _isProcessing = MutableStateFlow(false)
+    val isProcessing: StateFlow<Boolean> = _isProcessing.asStateFlow()
 
-    @ExperimentalGetImage
-    fun recognizeText(imageProxy: ImageProxy) {
+    private val _recognizedText = MutableStateFlow("")
+    val recognizedText: StateFlow<String> = _recognizedText.asStateFlow()
+
+    private val _showResult = MutableStateFlow(false)
+    val showResult: StateFlow<Boolean> = _showResult.asStateFlow()
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
+    fun recognizeText(imageProxy: ImageProxy) {  // ← No annotation needed
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isProcessing = true)
+            Log.d("CameraViewModel", "Starting text recognition...")
+            _isProcessing.value = true
+            _error.value = null
 
             textRecognitionRepository.recognizeText(imageProxy)
-                .onSuccess { recognizedText ->
-                    _uiState.value = _uiState.value.copy(
-                        isProcessing = false,
-                        recognizedText = recognizedText
-                    )
+                .onSuccess { text ->
+                    Log.d("CameraViewModel", "Text recognition successful: $text")
+                    _isProcessing.value = false
+                    _recognizedText.value = text
+                    _showResult.value = true
                 }
                 .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isProcessing = false,
-                        error = exception.message
-                    )
+                    Log.e("CameraViewModel", "Text recognition failed: ${exception.message}")
+                    _isProcessing.value = false
+                    _error.value = exception.message ?: "Unknown error occurred"
                 }
         }
     }
 
+    fun clearResults() {
+        _recognizedText.value = ""
+        _showResult.value = false
+        _error.value = null
+    }
+
     fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
+        _error.value = null
     }
 }
-
-data class CameraUiState(
-    val isProcessing: Boolean = false,
-    val recognizedText: String = "",
-    val error: String? = null
-)
