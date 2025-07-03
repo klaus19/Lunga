@@ -19,8 +19,9 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.buggy.lunga.ui.components.CameraPermissionScreen
 import com.buggy.lunga.ui.components.CameraPreview
 import com.buggy.lunga.ui.components.RecognizedTextBottomSheet
+import com.buggy.lunga.ui.components.TranslationBottomSheet
 
-@OptIn(ExperimentalPermissionsApi::class)  // ← Removed ExperimentalGetImage
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraScreen(
     viewModel: CameraViewModel = viewModel()
@@ -31,10 +32,18 @@ fun CameraScreen(
 
     when {
         cameraPermissionState.status.isGranted -> {
+            // Collect all states
             val isProcessing by viewModel.isProcessing.collectAsState()
             val recognizedText by viewModel.recognizedText.collectAsState()
             val showResult by viewModel.showResult.collectAsState()
             val error by viewModel.error.collectAsState()
+
+            // Translation states
+            val detectedLanguage by viewModel.detectedLanguage.collectAsState()
+            val selectedTargetLanguage by viewModel.selectedTargetLanguage.collectAsState()
+            val translationResult by viewModel.translationResult.collectAsState()
+            val isTranslating by viewModel.isTranslating.collectAsState()
+            val showTranslationSheet by viewModel.showTranslationSheet.collectAsState()
 
             var shouldCapture by remember { mutableStateOf(false) }
             var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -44,7 +53,7 @@ fun CameraScreen(
                 CameraPreview(
                     onImageCaptured = { imageProxy ->
                         Log.d("CameraScreen", "Image captured, processing...")
-                        viewModel.recognizeText(imageProxy)  // ← No annotation issues now
+                        viewModel.recognizeText(imageProxy)
                     },
                     onError = { exception ->
                         Log.e("CameraScreen", "Camera error: ${exception.message}")
@@ -80,12 +89,38 @@ fun CameraScreen(
                     }
                 }
 
-                // Results Bottom Sheet
-                if (showResult) {
+                // Simple Results Bottom Sheet (shows first)
+                if (showResult && !showTranslationSheet) {
                     RecognizedTextBottomSheet(
                         text = recognizedText,
                         onDismiss = { viewModel.clearResults() },
                         onTranslate = {
+                            viewModel.showTranslationSheet() // Show translation sheet
+                        }
+                    )
+                }
+
+                // Translation Bottom Sheet (shows when user clicks translate)
+                if (showTranslationSheet) {
+                    TranslationBottomSheet(
+                        recognizedText = recognizedText,
+                        detectedLanguage = detectedLanguage,
+                        selectedTargetLanguage = selectedTargetLanguage,
+                        translationResult = translationResult,
+                        isTranslating = isTranslating,
+                        onTargetLanguageChanged = { language ->
+                            viewModel.setTargetLanguage(language)
+                        },
+                        onTranslate = {
+                            viewModel.translateText()
+                        },
+                        onSwapLanguages = {
+                            viewModel.swapLanguages()
+                        },
+                        onSaveToHistory = {
+                            viewModel.saveTranslationToHistory()
+                        },
+                        onDismiss = {
                             viewModel.clearResults()
                         }
                     )
@@ -94,7 +129,7 @@ fun CameraScreen(
                 // Error Handling
                 error?.let { errorText ->
                     LaunchedEffect(errorText) {
-                        Log.e("CameraScreen", "ML Kit error: $errorText")
+                        Log.e("CameraScreen", "Error: $errorText")
                         viewModel.clearError()
                     }
                 }

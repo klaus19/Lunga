@@ -47,6 +47,16 @@ android {
             useLegacyPackaging = false
         }
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/LICENSE"
+            excludes += "/META-INF/LICENSE.txt"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/NOTICE.txt"
+        }
+    }
 }
 
 dependencies {
@@ -87,6 +97,19 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.material.icons.extended)
+
+    // ML Kit Language ID
+    implementation(libs.language.id)
+
+
+    // HTTP client for translation API
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
+    // Gson for JSON parsing
+    implementation(libs.gson)
 
 
 }
