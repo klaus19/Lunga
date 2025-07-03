@@ -32,7 +32,7 @@ fun RecognizedTextBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = bottomSheetState,
-        modifier = Modifier.fillMaxHeight(0.8f),
+        modifier = Modifier.fillMaxHeight(0.6f), // Smaller height since we have translation sheet
         dragHandle = {
             Surface(
                 modifier = Modifier.padding(vertical = 8.dp),
@@ -40,10 +40,7 @@ fun RecognizedTextBottomSheet(
                 shape = MaterialTheme.shapes.extraLarge
             ) {
                 Box(
-                    modifier = Modifier.size(
-                        width = 32.dp,
-                        height = 4.dp
-                    )
+                    modifier = Modifier.size(width = 32.dp, height = 4.dp)
                 )
             }
         }
@@ -157,7 +154,7 @@ fun RecognizedTextBottomSheet(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Translate Button
+                // Translate Button - This triggers the new translation flow
                 Button(
                     onClick = onTranslate,
                     modifier = Modifier.fillMaxWidth(),
