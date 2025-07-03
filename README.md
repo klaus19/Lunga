@@ -76,5 +76,5 @@ Language Assistant is a modern Android application that uses AI-powered text rec
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/language-assistant.git
-   cd language-assistant
+   git clone https://github.com/klaus19/Lunga
+   cd Lunga
