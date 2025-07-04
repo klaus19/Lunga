@@ -20,7 +20,7 @@ fun MainScreen() {
             TopAppBar(
                 title = {
                     Text(
-                        "Language Assistant",
+                        "Lunga",
                         fontWeight = FontWeight.Bold
                     )
                 },

@@ -113,11 +113,13 @@ dependencies {
     implementation(libs.gson)
 
     // Room Database
-    implementation("androidx.room:room-runtime:2.7.2")
-    implementation("androidx.room:room-ktx:2.7.2")
-    ksp("androidx.room:room-compiler:2.6.1")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     // Date formatting
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.0")
+    implementation(libs.kotlinx.datetime)
+
+    implementation(libs.androidx.core.splashscreen)
 
 }

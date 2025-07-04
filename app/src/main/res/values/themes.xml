@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Lunga" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Main app theme -->
+    <style name="Theme.Lunga" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Add any customizations here -->
+    </style>
+
+    <!-- IMMEDIATE splash theme - shows instantly -->
+    <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/lunga</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowDisablePreview">false</item>
+        <item name="android:windowIsTranslucent">false</item>
+    </style>
+
 </resources>

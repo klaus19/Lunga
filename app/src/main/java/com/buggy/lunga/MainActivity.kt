@@ -1,30 +1,19 @@
 package com.buggy.lunga
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.buggy.lunga.ui.screens.MainScreen
-import com.buggy.lunga.ui.theme.LungaTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        setContent {
-            LungaTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainScreen()
-                }
-            }
-        }
+        // Show splash for 2 seconds, then start main activity
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this, MainAppActivity::class.java))
+            finish() // Close splash activity
+        }, 2000) // 2 seconds delay
     }
 }
