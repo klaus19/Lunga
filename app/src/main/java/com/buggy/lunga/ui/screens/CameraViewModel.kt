@@ -1,11 +1,14 @@
 package com.buggy.lunga.ui.screens
 
+import android.app.Application
 import android.util.Log
 import androidx.camera.core.ImageProxy
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.buggy.lunga.data.database.AppDatabase
 import com.buggy.lunga.data.models.Language
 import com.buggy.lunga.data.models.TranslationResult
+import com.buggy.lunga.data.repositories.HistoryRepository
 import com.buggy.lunga.data.repositories.LanguageDetectionRepository
 import com.buggy.lunga.data.repositories.TextRecognitionRepository
 import com.buggy.lunga.data.repositories.TranslationRepository
@@ -14,7 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CameraViewModel : ViewModel() {
+class CameraViewModel(private val application: Application) : AndroidViewModel(application) {
 
     private val textRecognitionRepository = TextRecognitionRepository()
     private val languageDetectionRepository = LanguageDetectionRepository()
@@ -54,6 +57,11 @@ class CameraViewModel : ViewModel() {
 
     private val _showTranslationSheet = MutableStateFlow(false)
     val showTranslationSheet: StateFlow<Boolean> = _showTranslationSheet.asStateFlow()
+
+    private val historyRepository by lazy {
+        HistoryRepository(AppDatabase.getDatabase(application).translationDao())
+    }
+
 
     fun recognizeText(imageProxy: ImageProxy) {
         viewModelScope.launch {
@@ -112,7 +120,10 @@ class CameraViewModel : ViewModel() {
         }
 
         viewModelScope.launch {
-            Log.d("CameraViewModel", "Starting translation from ${sourceLanguage.name} to ${targetLanguage.name}")
+            Log.d(
+                "CameraViewModel",
+                "Starting translation from ${sourceLanguage.name} to ${targetLanguage.name}"
+            )
             _isTranslating.value = true
 
             translationRepository.translateText(text, sourceLanguage, targetLanguage)
@@ -135,6 +146,7 @@ class CameraViewModel : ViewModel() {
         _translationResult.value = null
     }
 
+
     fun swapLanguages() {
         val currentSource = _detectedLanguage.value
         val currentTarget = _selectedTargetLanguage.value
@@ -155,23 +167,33 @@ class CameraViewModel : ViewModel() {
     fun saveTranslationToHistory() {
         val result = _translationResult.value
         if (result != null) {
-            // TODO: Implement history saving in next phase
-            Log.d("CameraViewModel", "Saving translation to history: ${result.translatedText}")
+            viewModelScope.launch {
+                historyRepository.saveTranslation(result)
+                    .onSuccess {
+                        Log.d("CameraViewModel", "Translation saved to history successfully")
+                        // Optionally show success feedback
+                    }
+                    .onFailure { exception ->
+                        Log.e("CameraViewModel", "Failed to save translation to history", exception)
+                        _error.value = "Failed to save to history: ${exception.message}"
+                    }
+            }
+
         }
-    }
 
-    fun clearResults() {
-        _recognizedText.value = ""
-        _showResult.value = false
-        _showTranslationSheet.value = false
-        _error.value = null
-        _detectedLanguage.value = null
-        _translationResult.value = null
-        _isDetectingLanguage.value = false
-        _isTranslating.value = false
-    }
+        fun clearResults() {
+            _recognizedText.value = ""
+            _showResult.value = false
+            _showTranslationSheet.value = false
+            _error.value = null
+            _detectedLanguage.value = null
+            _translationResult.value = null
+            _isDetectingLanguage.value = false
+            _isTranslating.value = false
+        }
 
-    fun clearError() {
-        _error.value = null
+        fun clearError() {
+            _error.value = null
+        }
     }
 }
