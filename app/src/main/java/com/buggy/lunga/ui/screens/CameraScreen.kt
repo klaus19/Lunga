@@ -1,6 +1,7 @@
 package com.buggy.lunga.ui.screens
 
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -23,9 +25,11 @@ import com.buggy.lunga.ui.components.TranslationBottomSheet
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraScreen(
-    viewModel: CameraViewModel = viewModel()
-) {
+fun CameraScreen() {
+    val context = LocalContext.current
+    val viewModel: CameraViewModel = viewModel {
+        CameraViewModel(context.applicationContext as Application)
+    }
     val cameraPermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     )

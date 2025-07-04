@@ -17,11 +17,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CameraViewModel(private val application: Application) : AndroidViewModel(application) {
+class CameraViewModel(application: Application) : AndroidViewModel(application) {
 
     private val textRecognitionRepository = TextRecognitionRepository()
     private val languageDetectionRepository = LanguageDetectionRepository()
     private val translationRepository = TranslationRepository()
+    private val historyRepository by lazy {
+        HistoryRepository(AppDatabase.getDatabase(application).translationDao())
+    }
 
     // Text Recognition States
     private val _isProcessing = MutableStateFlow(false)
@@ -57,11 +60,6 @@ class CameraViewModel(private val application: Application) : AndroidViewModel(a
 
     private val _showTranslationSheet = MutableStateFlow(false)
     val showTranslationSheet: StateFlow<Boolean> = _showTranslationSheet.asStateFlow()
-
-    private val historyRepository by lazy {
-        HistoryRepository(AppDatabase.getDatabase(application).translationDao())
-    }
-
 
     fun recognizeText(imageProxy: ImageProxy) {
         viewModelScope.launch {
@@ -120,10 +118,7 @@ class CameraViewModel(private val application: Application) : AndroidViewModel(a
         }
 
         viewModelScope.launch {
-            Log.d(
-                "CameraViewModel",
-                "Starting translation from ${sourceLanguage.name} to ${targetLanguage.name}"
-            )
+            Log.d("CameraViewModel", "Starting translation from ${sourceLanguage.name} to ${targetLanguage.name}")
             _isTranslating.value = true
 
             translationRepository.translateText(text, sourceLanguage, targetLanguage)
@@ -145,7 +140,6 @@ class CameraViewModel(private val application: Application) : AndroidViewModel(a
         // Clear previous translation when language changes
         _translationResult.value = null
     }
-
 
     fun swapLanguages() {
         val currentSource = _detectedLanguage.value
@@ -178,22 +172,22 @@ class CameraViewModel(private val application: Application) : AndroidViewModel(a
                         _error.value = "Failed to save to history: ${exception.message}"
                     }
             }
-
         }
+    }
 
-        fun clearResults() {
-            _recognizedText.value = ""
-            _showResult.value = false
-            _showTranslationSheet.value = false
-            _error.value = null
-            _detectedLanguage.value = null
-            _translationResult.value = null
-            _isDetectingLanguage.value = false
-            _isTranslating.value = false
-        }
+    // ✅ FIXED: These methods were missing
+    fun clearResults() {
+        _recognizedText.value = ""
+        _showResult.value = false
+        _showTranslationSheet.value = false
+        _error.value = null
+        _detectedLanguage.value = null
+        _translationResult.value = null
+        _isDetectingLanguage.value = false
+        _isTranslating.value = false
+    }
 
-        fun clearError() {
-            _error.value = null
-        }
+    fun clearError() {
+        _error.value = null
     }
 }
