@@ -10,6 +10,8 @@ data class Language(
         fun getSupportedLanguages(): List<Language> = listOf(
             Language("en", "English", "English", "🇺🇸"),
             Language("es", "Spanish", "Español", "🇪🇸"),
+            Language("lt", "Lithuanian", "Lietuvių", "🇱🇹"),
+            Language("hi", "Hindi", "हिन्दी", "🇮🇳"),
             Language("fr", "French", "Français", "🇫🇷"),
             Language("de", "German", "Deutsch", "🇩🇪"),
             Language("it", "Italian", "Italiano", "🇮🇹"),
@@ -19,7 +21,6 @@ data class Language(
             Language("ko", "Korean", "한국어", "🇰🇷"),
             Language("zh", "Chinese", "中文", "🇨🇳"),
             Language("ar", "Arabic", "العربية", "🇸🇦"),
-            Language("hi", "Hindi", "हिन्दी", "🇮🇳"),
             Language("bn", "Bengali", "বাংলা", "🇧🇩"),
             Language("ur", "Urdu", "اردو", "🇵🇰"),
             Language("ta", "Tamil", "தமிழ்", "🇮🇳"),
